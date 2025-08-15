@@ -9,14 +9,7 @@ collections:
     files:
       - label: "Privacy Policy"
         name: "privacy"
-        file: "content/privacy.md"
-        fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Effective Date", name: "date", widget: "datetime" }
-          - { label: "Body", name: "body", widget: "markdown" }
-      - label: "Terms & Conditions"
-        name: "terms"
-        file: "content/terms.md"
+        file: "src/content/privacy.md"
         fields:
           - { label: "Title", name: "title", widget: "string" }
           - { label: "Effective Date", name: "date", widget: "datetime" }
