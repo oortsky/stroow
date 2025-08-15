@@ -1,16 +1,23 @@
 backend:
   name: git-gateway
   branch: main
-media_folder: public/img
-public_folder: img
+media_folder: "public/uploads"
+public_folder: "/uploads"
 collections:
   - name: "pages"
     label: "Pages"
     files:
       - label: "Privacy Policy"
         name: "privacy"
-        file: "src/content/privacy.md"
+        file: "src/content/privacy.mdx"
         fields:
           - { label: "Title", name: "title", widget: "string" }
-          - { label: "Effective Date", name: "date", widget: "datetime" }
+          - { label: "Date", name: "date", widget: "datetime" }
+          - { label: "Body", name: "body", widget: "markdown" }
+      - label: "Terms & Conditions"
+        name: "terms"
+        file: "src/content/terms.mdx"
+        fields:
+          - { label: "Title", name: "title", widget: "string" }
+          - { label: "Date", name: "date", widget: "datetime" }
           - { label: "Body", name: "body", widget: "markdown" }
