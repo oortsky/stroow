@@ -3,13 +3,9 @@ title: Kebijakan Privasi [Edited]
 date: 2025-08-15T15:44:04.969Z
 ---
 
-# {attributes.title}
+# Kebijakan Privasi
 
-**Tanggal Berlaku:** {new Date(attributes.date).toLocaleDateString("id-ID", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-})}
+**Tanggal Berlaku:** 16 Agustus 2025
 
 Kebijakan Privasi ini menjelaskan bagaimana **PT Troow Escrow Indonesia** ("Troow", "kami", atau "milik kami") mengumpulkan, menggunakan, menyimpan, dan melindungi informasi pribadi Pengguna saat menggunakan layanan escrow melalui situs web **https://troow.xyz** ("Platform").
 
