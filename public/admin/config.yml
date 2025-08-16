@@ -1,23 +1,89 @@
 backend:
   name: git-gateway
   branch: main
-media_folder: "public/uploads"
-public_folder: "/uploads"
+
+site_url: https://example.com
+
+publish_mode: editorial_workflow
+media_folder: public/uploads
+public_folder: /uploads
+
 collections:
-  - name: "pages"
-    label: "Pages"
+  - name: posts
+    label: Posts
+    folder: src/content/posts
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Draft", name: "draft", widget: "boolean", default: false }
+      - {
+          label: "Date",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - {
+          label: "Cover Image",
+          name: "image",
+          widget: "image",
+          required: false,
+        }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: privacy
+    label: Privacy Policy
+    files:
+      - label: "Privacy Policy"
+        name: privacy
+        file: src/content/privacy.mdx
+        fields:
+          - {
+              label: "Title",
+              name: "title",
+              widget: "string",
+              default: "Privacy Policy",
+            }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: terms
+    label: Terms & Conditions
     files:
       - label: "Terms & Conditions"
-        name: "terms"
-        file: "src/content/terms.mdx"
+        name: terms
+        file: src/content/terms.mdx
         fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Date", name: "date", widget: "datetime" }
-          - { label: "Body", name: "body", widget: "text" }
-      - label: "Privacy Policy"
-        name: "privacy"
-        file: "src/content/privacy.mdx"
+          - {
+              label: "Title",
+              name: "title",
+              widget: "string",
+              default: "Terms & Conditions",
+            }
+          - { label: "Body", name: "body", widget: "markdown" }
+
+  - name: settings
+    label: Settings
+    files:
+      - name: general
+        label: Site Settings
+        file: src/content/settings.json
         fields:
-          - { label: "Title", name: "title", widget: "string" }
-          - { label: "Date", name: "date", widget: "datetime" }
-          - { label: "Body", name: "body", widget: "text" }
+          - { label: "Site Title", name: "site_title", widget: "string" }
+          - { label: "Default Author", name: "author", widget: "string" }
+          - {
+              label: "Posts Per Page",
+              name: "posts_per_page",
+              widget: "number",
+              min: 1,
+              max: 20,
+            }
