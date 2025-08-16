@@ -3,13 +3,9 @@ title: Syarat & Ketentuan Layanan
 date: 2025-08-15T15:44:04.969Z
 ---
 
-# {attributes.title}
+# Syarat & Ketentuan Layanan
 
-**Tanggal Berlaku:** {new Date(attributes.date).toLocaleDateString("id-ID", {
-  day: "numeric",
-  month: "long",
-  year: "numeric",
-})}
+**Tanggal Berlaku:** 16 Agustus 2025
 
 Selamat datang di **Troow** — layanan escrow digital terpercaya yang disediakan oleh **PT Troow Escrow Indonesia** ("kami", "Troow", atau "milik kami"). Dengan mengakses dan menggunakan situs web **https://troow.xyz** ("Platform") dan layanan kami ("Layanan"), Anda ("Pengguna") dianggap telah membaca, memahami, dan menyetujui syarat dan ketentuan berikut ini.
 
