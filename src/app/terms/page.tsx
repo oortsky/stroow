@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Terms from "@/content/terms.mdx";
+import Terms from "@/content/terms.md";
 import MdxLayout from "@/components/mdx-layout";
 
 export const metadata = {

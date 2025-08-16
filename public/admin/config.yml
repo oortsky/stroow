@@ -46,7 +46,7 @@ collections:
     files:
       - label: "Privacy Policy"
         name: privacy
-        file: src/content/privacy.mdx
+        file: src/content/privacy.md
         fields:
           - {
               label: "Title",
@@ -68,7 +68,7 @@ collections:
     files:
       - label: "Terms & Conditions"
         name: terms
-        file: src/content/terms.mdx
+        file: src/content/terms.md
         fields:
           - {
               label: "Title",
