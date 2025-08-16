@@ -1,6 +1,6 @@
 ---
 title: Syarat & Ketentuan Layanan
-date: 2025-08-15T15:44:04.969Z
+date: 2025-08-16 13:50
 ---
 
 # Syarat & Ketentuan Layanan
