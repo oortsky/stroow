@@ -1,22 +1,26 @@
 backend:
-  name: git-gateway
+  name: github
+  repo: oortsky/stroow
   branch: main
+  auth_scope: repo
+
 media_folder: "public/uploads"
 public_folder: "/uploads"
+
 collections:
   - name: "pages"
     label: "Pages"
     files:
-      - label: "Privacy Policy"
-        name: "privacy"
-        file: "src/content/privacy.mdx"
+      - label: "Terms & Conditions"
+        name: "terms"
+        file: "src/content/terms.mdx"
         fields:
           - { label: "Title", name: "title", widget: "string" }
           - { label: "Date", name: "date", widget: "datetime" }
           - { label: "Body", name: "body", widget: "markdown" }
-      - label: "Terms & Conditions"
-        name: "terms"
-        file: "src/content/terms.mdx"
+      - label: "Privacy Policy"
+        name: "privacy"
+        file: "src/content/privacy.mdx"
         fields:
           - { label: "Title", name: "title", widget: "string" }
           - { label: "Date", name: "date", widget: "datetime" }
