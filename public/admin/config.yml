@@ -9,6 +9,32 @@ media_folder: public/uploads
 public_folder: /uploads
 
 collections:
+  - name: settings
+    label: Settings
+    files:
+      - name: general
+        label: Site Settings
+        file: src/content/settings.json
+        fields:
+          - { label: "Site Title", name: "site_title", widget: "string" }
+          - { label: "Default Author", name: "author", widget: "string" }
+          - {
+              label: "Posts Per Page",
+              name: "posts_per_page",
+              widget: "number",
+              min: 1,
+              max: 20,
+            }
+
+  - name: pages
+    label: Pages
+    folder: src/content/pages
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Body", name: "body", widget: "markdown" }
+
   - name: posts
     label: Posts
     folder: src/content/posts
@@ -32,14 +58,115 @@ collections:
         }
       - { label: "Body", name: "body", widget: "markdown" }
 
-  - name: pages
-    label: Pages
-    folder: src/content/pages
+  - name: faq
+    label: FAQ
+    folder: src/content/faq
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Question", name: "question", widget: "string" }
+      - { label: "Answer", name: "answer", widget: "markdown" }
+      - {
+          label: "Date",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+
+  - name: features
+    label: Features
+    folder: src/content/features
     create: true
     slug: "{{slug}}"
     fields:
       - { label: "Title", name: "title", widget: "string" }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Icon", name: "icon", widget: "image", required: false }
+      - { label: "Description", name: "description", widget: "markdown" }
+
+  - name: fees
+    label: Fees
+    folder: src/content/fees
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - {
+          label: "Type",
+          name: "type",
+          widget: "select",
+          options: ["percentage", "fixed"],
+        }
+      - {
+          label: "Amount",
+          name: "amount",
+          widget: "number",
+          value_type: "float",
+          min: 0,
+        }
+      - {
+          label: "Currency",
+          name: "currency",
+          widget: "string",
+          default: "USD",
+        }
+      - {
+          label: "Description",
+          name: "description",
+          widget: "markdown",
+          required: false,
+        }
+      - { label: "Active", name: "active", widget: "boolean", default: true }
+
+  - name: integrations
+    label: Integrations
+    folder: src/content/integrations
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Logo", name: "logo", widget: "image", required: false }
+      - { label: "Description", name: "description", widget: "markdown" }
+      - { label: "Link", name: "link", widget: "string", required: false }
+
+  - name: testimonials
+    label: Testimonials
+    folder: src/content/testimonials
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Role", name: "role", widget: "string", required: false }
+      - { label: "Company", name: "company", widget: "string", required: false }
+      - { label: "Photo", name: "photo", widget: "image", required: false }
+      - { label: "Testimonial", name: "testimonial", widget: "markdown" }
+
+  - name: team
+    label: Team Members
+    folder: src/content/team
+    create: true
+    slug: "{{slug}}"
+    fields:
+      - { label: "Name", name: "name", widget: "string" }
+      - { label: "Role", name: "role", widget: "string" }
+      - { label: "Photo", name: "photo", widget: "image", required: false }
+      - { label: "Bio", name: "bio", widget: "markdown" }
+
+  - name: changelog
+    label: Changelog
+    folder: src/content/changelog
+    create: true
+    slug: "{{year}}-{{month}}-{{day}}-{{slug}}"
+    fields:
+      - { label: "Title", name: "title", widget: "string" }
+      - {
+          label: "Date",
+          name: "date",
+          widget: "datetime",
+          format: "YYYY-MM-DD HH:mm",
+          default: "{{now}}",
+        }
+      - { label: "Changes", name: "changes", widget: "markdown" }
 
   - name: privacy
     label: Privacy Policy
@@ -84,20 +211,3 @@ collections:
               default: "{{now}}",
             }
           - { label: "Body", name: "body", widget: "markdown" }
-
-  - name: settings
-    label: Settings
-    files:
-      - name: general
-        label: Site Settings
-        file: src/content/settings.json
-        fields:
-          - { label: "Site Title", name: "site_title", widget: "string" }
-          - { label: "Default Author", name: "author", widget: "string" }
-          - {
-              label: "Posts Per Page",
-              name: "posts_per_page",
-              widget: "number",
-              min: 1,
-              max: 20,
-            }
