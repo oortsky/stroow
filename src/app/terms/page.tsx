@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import Terms from "@/content/terms.md";
+import Terms, { attributes } from "@/content/terms.md";
 import MdxLayout from "@/components/mdx-layout";
 
 export const metadata = {
@@ -10,11 +10,17 @@ export const metadata = {
 };
 
 export default function Page() {
+  const { title, date } = attributes;
+
   return (
     <main className="container w-full h-screen mx-auto p-4 font-sans">
       <ScrollArea className="w-full h-full rounded-md border mb-4">
         <div className="p-4">
           <MdxLayout>
+            <h1>{title}</h1>
+            <p>
+              <strong>Tanggal Berlaku:</strong> {date}
+            </p>
             <Terms />
           </MdxLayout>
         </div>
