@@ -1,55 +1,86 @@
+// global.d.ts
 declare module "*.md" {
   import * as React from "react";
-
-  // ----------- GENERIC COMPONENT EXPORT -----------
   const MDXComponent: React.FC;
   export default MDXComponent;
 }
 
-// ----------- PAGES (src/content/pages) -----------
+/* ========================
+   Pages (src/content/pages)
+   ======================== */
 declare module "@/content/pages/*.md" {
-  export interface PageFrontmatter {
+  import * as React from "react";
+
+  interface PageFrontmatter {
     title: string;
-    body: string; // markdown
+    body: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: PageFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- POSTS (src/content/posts) -----------
+/* ========================
+   Posts (src/content/posts)
+   ======================== */
 declare module "@/content/posts/*.md" {
-  export interface PostFrontmatter {
+  import * as React from "react";
+
+  interface PostFrontmatter {
     title: string;
     draft: boolean;
-    date: string; // "YYYY-MM-DD HH:mm"
+    date: string; // YYYY-MM-DD HH:mm
     image?: string;
     body: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: PostFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- FAQ (src/content/faq) -----------
+/* ========================
+   FAQ (src/content/faq)
+   ======================== */
 declare module "@/content/faq/*.md" {
-  export interface FaqFrontmatter {
+  import * as React from "react";
+
+  interface FaqFrontmatter {
     question: string;
-    answer: string; // markdown
+    answer: string;
     date: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: FaqFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- FEATURES (src/content/features) -----------
+/* ========================
+   Features (src/content/features)
+   ======================== */
 declare module "@/content/features/*.md" {
-  export interface FeatureFrontmatter {
+  import * as React from "react";
+
+  interface FeatureFrontmatter {
     title: string;
     icon?: string;
-    description: string; // markdown
+    description: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: FeatureFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- FEES (src/content/fees) -----------
+/* ========================
+   Fees (src/content/fees)
+   ======================== */
 declare module "@/content/fees/*.md" {
-  export interface FeeFrontmatter {
+  import * as React from "react";
+
+  interface FeeFrontmatter {
     name: string;
     type: "percentage" | "fixed";
     amount: number;
@@ -57,69 +88,114 @@ declare module "@/content/fees/*.md" {
     description?: string;
     active: boolean;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: FeeFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- INTEGRATIONS (src/content/integrations) -----------
+/* ========================
+   Integrations (src/content/integrations)
+   ======================== */
 declare module "@/content/integrations/*.md" {
-  export interface IntegrationFrontmatter {
+  import * as React from "react";
+
+  interface IntegrationFrontmatter {
     name: string;
     logo?: string;
     description: string;
     link?: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: IntegrationFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- TESTIMONIALS (src/content/testimonials) -----------
+/* ========================
+   Testimonials (src/content/testimonials)
+   ======================== */
 declare module "@/content/testimonials/*.md" {
-  export interface TestimonialFrontmatter {
+  import * as React from "react";
+
+  interface TestimonialFrontmatter {
     name: string;
     role?: string;
     company?: string;
     photo?: string;
     testimonial: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: TestimonialFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- TEAM (src/content/team) -----------
+/* ========================
+   Team (src/content/team)
+   ======================== */
 declare module "@/content/team/*.md" {
-  export interface TeamMemberFrontmatter {
+  import * as React from "react";
+
+  interface TeamFrontmatter {
     name: string;
     role: string;
     photo?: string;
     bio: string;
   }
-  export const attributes: TeamMemberFrontmatter;
+
+  const MDXComponent: React.FC;
+  export const attributes: TeamFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- CHANGELOG (src/content/changelog) -----------
+/* ========================
+   Changelog (src/content/changelog)
+   ======================== */
 declare module "@/content/changelog/*.md" {
-  export interface ChangelogFrontmatter {
+  import * as React from "react";
+
+  interface ChangelogFrontmatter {
     title: string;
     date: string;
     changes: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: ChangelogFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- PRIVACY POLICY (src/content/privacy.md) -----------
+/* ========================
+   Privacy Policy (src/content/privacy.md)
+   ======================== */
 declare module "@/content/privacy.md" {
-  export interface PrivacyFrontmatter {
+  import * as React from "react";
+
+  interface PrivacyFrontmatter {
     title: string;
     date: string;
     body: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: PrivacyFrontmatter;
+  export default MDXComponent;
 }
 
-// ----------- TERMS & CONDITIONS (src/content/terms.md) -----------
+/* ========================
+   Terms (src/content/terms.md)
+   ======================== */
 declare module "@/content/terms.md" {
-  export interface TermsFrontmatter {
+  import * as React from "react";
+
+  interface TermsFrontmatter {
     title: string;
     date: string;
     body: string;
   }
+
+  const MDXComponent: React.FC;
   export const attributes: TermsFrontmatter;
+  export default MDXComponent;
 }
