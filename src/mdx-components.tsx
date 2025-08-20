@@ -10,14 +10,17 @@ import Image, { ImageProps } from "next/image";
  */
 
 const components = {
-  // Allows customizing built-in components, e.g. to add styling.
-  img: props => (
-    <Image
-      sizes="100vw"
-      style={{ width: "100%", height: "auto" }}
-      {...(props as ImageProps)}
-    />
-  )
+  img: (props: ImageProps) => {
+    const { alt, ...rest } = props;
+    return (
+      <Image
+        sizes="100vw"
+        style={{ width: "100%", height: "auto" }}
+        alt={alt || "Troow Image"}
+        {...rest}
+      />
+    );
+  },
 } satisfies MDXComponents;
 
 export function useMDXComponents(): MDXComponents {
