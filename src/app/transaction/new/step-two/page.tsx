@@ -54,7 +54,7 @@ type PayeeFormValues = z.output<typeof payeeSchema>;
 
 export default function StepTwoPage() {
   const router = useRouter();
-  const { form, updateForm } = useFormContext();
+  const { form, updateForm, currentStep, setCurrentStep, totalSteps} = useFormContext();
 
   const stepTwoForm = useForm<PayeeFormValues>({
     resolver: zodResolver(payeeSchema),
@@ -84,18 +84,21 @@ export default function StepTwoPage() {
       payee: { ...values, same_as_name: sameAsName }
     });
     router.push("/transaction/new/step-three");
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
   }
 
   function prevStep() {
     router.back();
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep - 1);
+    }
   }
 
   return (
     <Form {...stepTwoForm}>
-      <form
-        onSubmit={stepTwoForm.handleSubmit(onSubmit)}
-        className="p-6 rounded-lg shadow space-y-6"
-      >
+      <form onSubmit={stepTwoForm.handleSubmit(onSubmit)} className="space-y-6">
         {/* --- First Name --- */}
         <FormField
           control={stepTwoForm.control}

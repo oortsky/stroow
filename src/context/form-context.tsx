@@ -64,6 +64,9 @@ export type Form = {
 export interface FormContextProps {
   form: Form;
   updateForm: (property: Partial<Form>) => void;
+  currentStep: number;
+  setCurrentStep: (step: number) => void;
+  totalSteps: number;
 }
 
 const defaultForm: Form = {
@@ -76,7 +79,7 @@ const defaultForm: Form = {
     account_bank: "" as BankValue,
     account_number: "",
     account_holder_name: "",
-    same_as_name: false,
+    same_as_name: false
   },
   payee: {
     id: "",
@@ -87,7 +90,7 @@ const defaultForm: Form = {
     account_bank: "" as BankValue,
     account_number: "",
     account_holder_name: "",
-    same_as_name: false,
+    same_as_name: false
   },
   transaction: {
     id: "",
@@ -104,25 +107,28 @@ const defaultForm: Form = {
     snap: {
       transaction_details: {
         order_id: "",
-        gross_amount: 0,
+        gross_amount: 0
       },
       item_details: [],
       customer_details: {
         first_name: "",
         last_name: "",
         email: "",
-        phone: "",
-      },
-    },
+        phone: ""
+      }
+    }
   },
   additional: {
-    isAcceptTnC: false,
-  },
+    isAcceptTnC: false
+  }
 };
 
 export const FormContext = createContext<FormContextProps>({
   form: defaultForm,
-  updateForm: () => null
+  updateForm: () => null,
+  currentStep: 1,
+  setCurrentStep: () => null,
+  totalSteps: 4
 });
 
 export const useFormContext = () => {
@@ -139,6 +145,8 @@ interface FormProviderProps {
 
 export function FormProvider({ children }: FormProviderProps) {
   const [form, setForm] = useState<Form>(defaultForm);
+  const [currentStep, setCurrentStep] = useState<number>(1);
+  const totalSteps = 4;
 
   const updateForm = (values: Partial<Form>) => {
     setForm(prev => ({
@@ -148,7 +156,9 @@ export function FormProvider({ children }: FormProviderProps) {
   };
 
   return (
-    <FormContext.Provider value={{ form, updateForm }}>
+    <FormContext.Provider
+      value={{ form, updateForm, currentStep, setCurrentStep, totalSteps }}
+    >
       {children}
     </FormContext.Provider>
   );

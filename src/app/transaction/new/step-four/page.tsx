@@ -46,7 +46,8 @@ type AdditionalFormValues = z.output<typeof additionalSchema>;
 
 export default function Page() {
   const router = useRouter();
-  const { form, updateForm } = useFormContext();
+  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
+    useFormContext();
 
   const stepFourSchema = useForm<AdditionalFormValues>({
     resolver: zodResolver(additionalSchema),
@@ -71,140 +72,182 @@ export default function Page() {
 
   function prevStep() {
     router.back();
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep - 1);
+    }
   }
 
   return (
-    <div className="p-6 rounded-lg shadow space-y-6">
+    <div className="space-y-6">
       {/* --- Transaction Review --- */}
-      <Accordion type="multiple" className="w-full">
-        {/* --- Payer Information --- */}
-        <AccordionItem value="payer">
-          <AccordionTrigger>Payer Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">ID:</span>
-                <span className="font-mono">{form.payer?.id || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Full Name:</span>
-                <span className="font-mono">
-                  {getFullName(form.payer?.first_name, form.payer?.last_name) ||
-                    "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="font-mono">{form.payer?.email || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Phone:</span>
-                <span className="font-mono">{form.payer?.phone || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Bank:</span>
-                <span className="font-mono">
-                  {getLabel(Banks, form.payer?.account_bank ?? "") || "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Number:</span>
-                <span className="font-mono">
-                  {form.payer?.account_number || "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Holder:</span>
-                <span className="font-mono">
-                  {form.payer?.account_holder_name || "-"}
-                </span>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        {/* --- Payee Information --- */}
-        <AccordionItem value="payee">
-          <AccordionTrigger>Payee Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">ID:</span>
-                <span className="font-mono">{form.payee?.id || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Full Name:</span>
-                <span className="font-mono">
-                  {getFullName(form.payee?.first_name, form.payee?.last_name) ||
-                    "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Email:</span>
-                <span className="font-mono">{form.payee?.email || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Phone:</span>
-                <span className="font-mono">{form.payee?.phone || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Bank:</span>
-                <span className="font-mono">
-                  {getLabel(Banks, form.payee?.account_bank ?? "") || "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Number:</span>
-                <span className="font-mono">
-                  {form.payee?.account_number || "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Account Holder:</span>
-                <span className="font-mono">
-                  {form.payee?.account_holder_name || "-"}
-                </span>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-        {/* --- Transaction Information --- */}
-        <AccordionItem value="transaction">
-          <AccordionTrigger>Transaction Information</AccordionTrigger>
-          <AccordionContent>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">ID:</span>
-                <span className="font-mono">{form.transaction?.id || "-"}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Name:</span>
-                <span className="font-mono">
-                  {form.transaction?.name || "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Category:</span>
-                <span className="font-mono">
-                  {getLabel(Categories, form.transaction?.category ?? "") ||
-                    "-"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Amount:</span>
-                <span className="font-mono">
-                  Rp{form.transaction?.amount.toLocaleString("id-ID") || "0"}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-muted-foreground">Note:</span>
-                <span className="font-mono">
-                  {form.transaction?.note || "-"}
-                </span>
-              </div>
-            </div>
-          </AccordionContent>
-        </AccordionItem>
-      </Accordion>
+      <Card>
+        <CardHeader>
+          <CardTitle>Summary</CardTitle>
+          <CardDescription>
+            Here’s a quick recap of your transaction with payer and payee
+            details.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Accordion type="multiple" className="w-full">
+            {/* --- Payer Information --- */}
+            <AccordionItem value="payer">
+              <AccordionTrigger>Payer Information</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ID:</span>
+                    <span className="font-mono">{form.payer?.id || "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Full Name:</span>
+                    <span className="font-mono">
+                      {getFullName(
+                        form.payer?.first_name,
+                        form.payer?.last_name
+                      ) || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-mono">
+                      {form.payer?.email || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phone:</span>
+                    <span className="font-mono">
+                      {form.payer?.phone || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Account Bank:</span>
+                    <span className="font-mono">
+                      {getLabel(Banks, form.payer?.account_bank ?? "") || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Account Number:
+                    </span>
+                    <span className="font-mono">
+                      {form.payer?.account_number || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Account Holder:
+                    </span>
+                    <span className="font-mono">
+                      {form.payer?.account_holder_name || "-"}
+                    </span>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {/* --- Payee Information --- */}
+            <AccordionItem value="payee">
+              <AccordionTrigger>Payee Information</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ID:</span>
+                    <span className="font-mono">{form.payee?.id || "-"}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Full Name:</span>
+                    <span className="font-mono">
+                      {getFullName(
+                        form.payee?.first_name,
+                        form.payee?.last_name
+                      ) || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Email:</span>
+                    <span className="font-mono">
+                      {form.payee?.email || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Phone:</span>
+                    <span className="font-mono">
+                      {form.payee?.phone || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Account Bank:</span>
+                    <span className="font-mono">
+                      {getLabel(Banks, form.payee?.account_bank ?? "") || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Account Number:
+                    </span>
+                    <span className="font-mono">
+                      {form.payee?.account_number || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">
+                      Account Holder:
+                    </span>
+                    <span className="font-mono">
+                      {form.payee?.account_holder_name || "-"}
+                    </span>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+            {/* --- Transaction Information --- */}
+            <AccordionItem value="transaction">
+              <AccordionTrigger>Transaction Information</AccordionTrigger>
+              <AccordionContent>
+                <div className="space-y-2 text-sm">
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">ID:</span>
+                    <span className="font-mono">
+                      {form.transaction?.id || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Name:</span>
+                    <span className="font-mono">
+                      {form.transaction?.name || "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Category:</span>
+                    <span className="font-mono">
+                      {getLabel(Categories, form.transaction?.category ?? "") ||
+                        "-"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Amount:</span>
+                    <span className="font-mono">
+                      Rp
+                      {form.transaction?.amount.toLocaleString("id-ID") || "0"}
+                    </span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-muted-foreground">Note:</span>
+                    <span className="font-mono">
+                      {form.transaction?.note || "-"}
+                    </span>
+                  </div>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </CardContent>
+        <CardFooter>
+          <p className="text-xs text-muted-foreground">
+            Double-check everything here before moving on to payment.
+          </p>
+        </CardFooter>
+      </Card>
 
       {/* --- Transaction Calculation --- */}
       <Card>

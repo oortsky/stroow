@@ -54,7 +54,8 @@ type PayerFormValues = z.output<typeof payerSchema>;
 
 export default function StepOnePage() {
   const router = useRouter();
-  const { form, updateForm } = useFormContext();
+  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
+    useFormContext();
 
   const stepOneForm = useForm<PayerFormValues>({
     resolver: zodResolver(payerSchema),
@@ -84,14 +85,14 @@ export default function StepOnePage() {
       payer: { ...values, same_as_name: sameAsName }
     });
     router.push("/transaction/new/step-two");
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
   }
 
   return (
     <Form {...stepOneForm}>
-      <form
-        onSubmit={stepOneForm.handleSubmit(onSubmit)}
-        className="p-6 rounded-lg shadow space-y-6"
-      >
+      <form onSubmit={stepOneForm.handleSubmit(onSubmit)} className="space-y-6">
         {/* --- First Name --- */}
         <FormField
           control={stepOneForm.control}

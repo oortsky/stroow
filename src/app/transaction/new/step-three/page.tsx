@@ -54,7 +54,8 @@ type TransactionFormValues = z.output<typeof transactionFormSchema>;
 
 export default function Page() {
   const router = useRouter();
-  const { form, updateForm } = useFormContext();
+  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
+    useFormContext();
 
   const stepThreeForm = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionFormSchema),
@@ -100,13 +101,23 @@ export default function Page() {
 
     updateForm({ transaction: trx });
     router.push("/transaction/new/step-four");
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep + 1);
+    }
+  }
+  
+  function prevStep() {
+    router.back();
+    if (currentStep < totalSteps) {
+      setCurrentStep(currentStep - 1);
+    }
   }
 
   return (
     <Form {...stepThreeForm}>
       <form
         onSubmit={stepThreeForm.handleSubmit(onSubmit)}
-        className="p-6 rounded-lg shadow space-y-6"
+        className="space-y-6"
       >
         {/* --- Name --- */}
         <FormField
@@ -184,7 +195,7 @@ export default function Page() {
 
         {/* --- Buttons --- */}
         <div className="flex justify-between pt-6">
-          <Button type="button" variant="outline" onClick={() => router.back()}>
+<Button type="button" variant="outline" onClick={prevStep}>
             Back
           </Button>
           <Button type="submit">Next</Button>
