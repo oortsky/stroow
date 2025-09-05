@@ -9,6 +9,9 @@ import { getLabel } from "@/utils/label";
 import { Categories } from "@/lib/enums/categories";
 import { Banks } from "@/lib/enums/banks";
 import { getFullName } from "@/utils/fullname";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { useInsertUser, useInsertTransaction } from "@/hooks/use-insert";
 
 import {
   Form,
@@ -16,10 +19,12 @@ import {
   FormItem,
   FormLabel,
   FormControl,
+  FormDescription,
   FormMessage
 } from "@/components/ui/form";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import {
   Accordion,
   AccordionContent,
@@ -46,35 +51,65 @@ type AdditionalFormValues = z.output<typeof additionalSchema>;
 
 export default function Page() {
   const router = useRouter();
-  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
-    useFormContext();
+  const { form, updateForm, resetForm } = useFormContext();
 
-  const stepFourSchema = useForm<AdditionalFormValues>({
+  const stepFourForm = useForm<AdditionalFormValues>({
     resolver: zodResolver(additionalSchema),
-    mode: "onSubmit",
+    mode: "onChange",
     defaultValues: form.additional
   });
 
-  function onSubmit(values: AdditionalFormValues) {
-    updateForm({
+  async function onSubmit(values: AdditionalFormValues) {
+    const updatedForm = {
+      ...form,
       additional: { ...values }
-    });
+    };
 
-    console.log("Form Data:", form);
-    toast("You submitted the following values", {
+    updateForm(updatedForm);
+    const response = await axios.post(
+      `${process.env.NEXT_PUBLIC_BASE_URL!}/api/midtrans/token`,
+      updatedForm.transaction.snap
+    );
+
+    if (typeof window !== "undefined" && (window as any).snap) {
+      (window as any).snap.pay(response?.data?.token, {
+        onSuccess: async (result: any) => {
+          try {
+            toast.success("Payment successful! Your funds are now in escrow.");
+
+            await useInsertUser(updatedForm.payer);
+            await useInsertUser(updatedForm.payee);
+            await useInsertTransaction(updatedForm.transaction);
+
+            await router.push(
+              `/transaction/${updatedForm.transaction?.id}?role=${updatedForm.payer?.id}`
+            );
+            await resetForm();
+            await Cookies.remove("step1-done", { path: "/transaction/new" });
+            await Cookies.remove("step2-done", { path: "/transaction/new" });
+            await Cookies.remove("step3-done", { path: "/transaction/new" });
+          } catch (error) {
+            console.error("Error creating records:", error);
+          }
+        },
+        onPending: (r: any) => console.log("Pending:", r),
+        onError: (e: any) => console.error("Snap error:", e)
+      });
+    }
+
+    /*toast("You submitted the following values", {
       description: (
-        <pre className="mt-2 w-[320px] rounded-md bg-neutral-950 p-4">
-          <code className="text-white">{JSON.stringify(form, null, 2)}</code>
+        <pre className="mt-2 w-full rounded-md bg-neutral-950 p-4">
+          <code className="text-white">
+            {JSON.stringify(updatedForm, null, 2)}
+          </code>
         </pre>
       )
-    });
+    });*/
   }
 
   function prevStep() {
     router.back();
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep - 1);
-    }
   }
 
   return (
@@ -118,28 +153,6 @@ export default function Page() {
                     <span className="text-muted-foreground">Phone:</span>
                     <span className="font-mono">
                       {form.payer?.phone || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">Account Bank:</span>
-                    <span className="font-mono">
-                      {getLabel(Banks, form.payer?.account_bank ?? "") || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Account Number:
-                    </span>
-                    <span className="font-mono">
-                      {form.payer?.account_number || "-"}
-                    </span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-muted-foreground">
-                      Account Holder:
-                    </span>
-                    <span className="font-mono">
-                      {form.payer?.account_holder_name || "-"}
                     </span>
                   </div>
                 </div>
@@ -282,7 +295,8 @@ export default function Page() {
             <div className="flex justify-between text-base font-semibold">
               <span className="text-muted-foreground">Total Payment:</span>
               <span className="font-mono font-bold">
-                Rp{form.transaction?.total.toLocaleString("id-ID") || "0"}
+                Rp
+                {form.transaction?.total.toLocaleString("id-ID") || "0"}
               </span>
             </div>
           </div>
@@ -294,11 +308,15 @@ export default function Page() {
         </CardFooter>
       </Card>
 
-      {/* --- Terms and Conditions --- */}
-      <Form {...stepFourSchema}>
-        <form onSubmit={stepFourSchema.handleSubmit(onSubmit)}>
+      {/* --- Additional --- */}
+      <Form {...stepFourForm}>
+        <form
+          onSubmit={stepFourForm.handleSubmit(onSubmit)}
+          className="space-y-6"
+        >
+          {/* --- Terms and Conditions --- */}
           <FormField
-            control={stepFourSchema.control}
+            control={stepFourForm.control}
             name="isAcceptTnC"
             render={({ field }) => (
               <FormItem>

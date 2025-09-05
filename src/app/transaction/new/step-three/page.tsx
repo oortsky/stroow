@@ -7,6 +7,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Categories } from "@/lib/enums/categories";
 import { TransactionStatusEnum } from "@/lib/enums/transaction-status";
+import Cookies from "js-cookie";
 
 import {
   Form,
@@ -47,22 +48,26 @@ const transactionFormSchema = z.object({
   amount: z
     .number()
     .min(10000, "Transaction amount must be at least Rp10.000."),
-  note: z.string().optional()
+  note: z.string().optional(),
+  pin: z
+    .string()
+    .transform(val => (val && val.length > 0 ? val : encrypt(randomPIN())))
 });
 
 type TransactionFormValues = z.output<typeof transactionFormSchema>;
 
 export default function Page() {
   const router = useRouter();
-  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
-    useFormContext();
+  const { form, updateForm } = useFormContext();
 
   const stepThreeForm = useForm<TransactionFormValues>({
     resolver: zodResolver(transactionFormSchema),
     mode: "onChange",
     defaultValues: {
       ...form.transaction,
-      id: form.transaction?.id || randomID("TRX")
+      id: form.transaction?.id || randomID("TRX"),
+      status: TransactionStatusEnum.PENDING,
+      pin: form.transaction?.pin || encrypt(randomPIN())
     }
   });
 
@@ -79,8 +84,6 @@ export default function Page() {
       payee_id: payee?.id ?? randomID("PYE"),
       service_fee,
       total,
-      status: TransactionStatusEnum.PENDING,
-      pin: encrypt(randomPIN()),
       snap: {
         transaction_details: {
           order_id: values.id,
@@ -100,17 +103,13 @@ export default function Page() {
     };
 
     updateForm({ transaction: trx });
+    Cookies.set("step3-done", "true", { path: "/transaction/new" });
     router.push("/transaction/new/step-four");
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
   }
-  
+
   function prevStep() {
+    Cookies.remove("step3-done", { path: "/transaction/new" });
     router.back();
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep - 1);
-    }
   }
 
   return (
@@ -195,7 +194,7 @@ export default function Page() {
 
         {/* --- Buttons --- */}
         <div className="flex justify-between pt-6">
-<Button type="button" variant="outline" onClick={prevStep}>
+          <Button type="button" variant="outline" onClick={prevStep}>
             Back
           </Button>
           <Button type="submit">Next</Button>

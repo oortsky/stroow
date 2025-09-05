@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useFormContext } from "@/context/form-context";
 import { useForm } from "react-hook-form";
@@ -8,7 +7,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Banks } from "@/lib/enums/banks";
 import { randomID } from "@/utils/id";
-import { getFullName } from "@/utils/fullname";
+import Cookies from "js-cookie";
 
 import {
   Form,
@@ -21,9 +20,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { InputPhone } from "@/components/ui/input-phone";
 import { Button } from "@/components/ui/button";
-import { Combobox } from "@/components/ui/combobox";
-import { Switch } from "@/components/ui/switch";
-import { Label } from "@/components/ui/label";
 
 const payerSchema = z.object({
   id: z
@@ -34,28 +30,14 @@ const payerSchema = z.object({
   email: z.string().email("Please enter a valid email address."),
   phone: z.string().regex(/^\+62\d{9,13}$/, {
     message: "Phone must start with +62 and be 11–15 digits."
-  }),
-  account_bank: z.enum(
-    Banks.map(b => b.value),
-    {
-      message: "Please select a valid bank."
-    }
-  ),
-  account_number: z
-    .string()
-    .min(5, "Account number must be at least 5 digits."),
-  account_holder_name: z
-    .string()
-    .min(3, "Account holder name must be at least 3 characters."),
-  same_as_name: z.boolean().default(false).optional()
+  })
 });
 
 type PayerFormValues = z.output<typeof payerSchema>;
 
-export default function StepOnePage() {
+export default function Page() {
   const router = useRouter();
-  const { form, updateForm, currentStep, setCurrentStep, totalSteps } =
-    useFormContext();
+  const { form, updateForm } = useFormContext();
 
   const stepOneForm = useForm<PayerFormValues>({
     resolver: zodResolver(payerSchema),
@@ -66,28 +48,15 @@ export default function StepOnePage() {
     }
   });
 
-  const sameAsName = stepOneForm.watch("same_as_name") ?? false;
-  const fullName = getFullName(
-    stepOneForm.watch("first_name"),
-    stepOneForm.watch("last_name")
-  );
-
-  useEffect(() => {
-    if (sameAsName && fullName) {
-      stepOneForm.setValue("account_holder_name", fullName.toUpperCase(), {
-        shouldValidate: true
-      });
-    }
-  }, [sameAsName, fullName, stepOneForm]);
-
   function onSubmit(values: PayerFormValues) {
-    updateForm({
-      payer: { ...values, same_as_name: sameAsName }
-    });
+    updateForm({ payer: { ...values } });
+    Cookies.set("step1-done", "true", { path: "/transaction/new" });
     router.push("/transaction/new/step-two");
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
+  }
+
+  function prevStep() {
+    Cookies.remove("step1-done", { path: "/transaction/new" });
+    router.back();
   }
 
   return (
@@ -156,79 +125,11 @@ export default function StepOnePage() {
           )}
         />
 
-        {/* --- Account Bank --- */}
-        <FormField
-          control={stepOneForm.control}
-          name="account_bank"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Bank</FormLabel>
-              <FormControl>
-                <Combobox
-                  items={[...Banks]}
-                  placeholder="Select bank..."
-                  searchPlaceholder="Search bank..."
-                  value={field.value}
-                  onChange={field.onChange}
-                  className="w-full"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* --- Account Number --- */}
-        <FormField
-          control={stepOneForm.control}
-          name="account_number"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Account Number</FormLabel>
-              <FormControl>
-                <Input inputMode="numeric" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        {/* --- Account Holder Name + Switch --- */}
-        <FormField
-          control={stepOneForm.control}
-          name="account_holder_name"
-          render={({ field }) => (
-            <FormItem>
-              <div className="flex items-center justify-between mb-2">
-                <FormLabel>Account Holder Name</FormLabel>
-                <div className="flex items-center gap-2">
-                  <Label htmlFor="sameAsName" className="text-xs">
-                    Same as Name
-                  </Label>
-                  <Switch
-                    id="sameAsName"
-                    checked={sameAsName}
-                    onCheckedChange={val =>
-                      stepOneForm.setValue("same_as_name", val)
-                    }
-                  />
-                </div>
-              </div>
-              <FormControl>
-                <Input
-                  {...field}
-                  value={field.value ?? ""}
-                  onChange={e => field.onChange(e.target.value.toUpperCase())}
-                  disabled={sameAsName}
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         {/* --- Buttons --- */}
-        <div className="flex justify-end pt-6">
+        <div className="flex justify-between pt-6">
+          <Button type="button" variant="outline" onClick={prevStep}>
+            Back
+          </Button>
           <Button type="submit">Next</Button>
         </div>
       </form>

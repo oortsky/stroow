@@ -1,7 +1,12 @@
-import { createContext, useState, useContext, ReactNode } from "react";
-import { BankValue } from "@/lib/enums/banks";
-import { CategoryValue } from "@/lib/enums/categories";
-import { TransactionStatusEnum } from "@/lib/enums/transaction-status";
+"use client";
+
+import {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect
+} from "react";
 
 export type Form = {
   payer: {
@@ -10,10 +15,6 @@ export type Form = {
     last_name: string;
     email: string;
     phone: string;
-    account_bank: BankValue;
-    account_number: string;
-    account_holder_name: string;
-    same_as_name: boolean;
   };
   payee: {
     id: string;
@@ -21,7 +22,7 @@ export type Form = {
     last_name: string;
     email: string;
     phone: string;
-    account_bank: BankValue;
+    account_bank: string;
     account_number: string;
     account_holder_name: string;
     same_as_name: boolean;
@@ -31,12 +32,12 @@ export type Form = {
     payer_id: string;
     payee_id: string;
     name: string;
-    category: CategoryValue;
+    category: string;
     amount: number;
     service_fee: number;
     total: number;
     note?: string;
-    status: TransactionStatusEnum;
+    status: string;
     pin: string;
     snap: {
       transaction_details: {
@@ -54,9 +55,11 @@ export type Form = {
         email: string;
         phone: string;
       };
+      promo_code: string;
     };
   };
   additional: {
+    voucher?: string;
     isAcceptTnC: boolean;
   };
 };
@@ -64,9 +67,7 @@ export type Form = {
 export interface FormContextProps {
   form: Form;
   updateForm: (property: Partial<Form>) => void;
-  currentStep: number;
-  setCurrentStep: (step: number) => void;
-  totalSteps: number;
+  resetForm: () => void;
 }
 
 const defaultForm: Form = {
@@ -75,11 +76,7 @@ const defaultForm: Form = {
     first_name: "",
     last_name: "",
     email: "",
-    phone: "",
-    account_bank: "" as BankValue,
-    account_number: "",
-    account_holder_name: "",
-    same_as_name: false
+    phone: ""
   },
   payee: {
     id: "",
@@ -87,7 +84,7 @@ const defaultForm: Form = {
     last_name: "",
     email: "",
     phone: "",
-    account_bank: "" as BankValue,
+    account_bank: "",
     account_number: "",
     account_holder_name: "",
     same_as_name: false
@@ -97,12 +94,12 @@ const defaultForm: Form = {
     payer_id: "",
     payee_id: "",
     name: "",
-    category: "" as CategoryValue,
+    category: "",
     amount: 0,
     service_fee: 0,
     total: 0,
     note: "",
-    status: TransactionStatusEnum.PENDING,
+    status: "",
     pin: "",
     snap: {
       transaction_details: {
@@ -115,10 +112,12 @@ const defaultForm: Form = {
         last_name: "",
         email: "",
         phone: ""
-      }
+      },
+      promo_code: ""
     }
   },
   additional: {
+    voucher: "",
     isAcceptTnC: false
   }
 };
@@ -126,15 +125,13 @@ const defaultForm: Form = {
 export const FormContext = createContext<FormContextProps>({
   form: defaultForm,
   updateForm: () => null,
-  currentStep: 1,
-  setCurrentStep: () => null,
-  totalSteps: 4
+  resetForm: () => null
 });
 
 export const useFormContext = () => {
   const context = useContext(FormContext);
   if (!context) {
-    throw new Error("useFormContext must be used within a FormContextProvider");
+    throw new Error("useFormContext must be used within a FormProvider");
   }
   return context;
 };
@@ -143,10 +140,26 @@ interface FormProviderProps {
   children: ReactNode;
 }
 
+const STORAGE_KEY = "escrow:form";
+
 export function FormProvider({ children }: FormProviderProps) {
   const [form, setForm] = useState<Form>(defaultForm);
-  const [currentStep, setCurrentStep] = useState<number>(1);
-  const totalSteps = 4;
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        setForm(JSON.parse(saved));
+      }
+    } catch (err) {
+      console.warn("Invalid form data in localStorage, resetting...");
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
+  }, [form]);
 
   const updateForm = (values: Partial<Form>) => {
     setForm(prev => ({
@@ -155,10 +168,13 @@ export function FormProvider({ children }: FormProviderProps) {
     }));
   };
 
+  const resetForm = () => {
+    setForm(defaultForm);
+    localStorage.removeItem(STORAGE_KEY);
+  };
+
   return (
-    <FormContext.Provider
-      value={{ form, updateForm, currentStep, setCurrentStep, totalSteps }}
-    >
+    <FormContext.Provider value={{ form, updateForm, resetForm }}>
       {children}
     </FormContext.Provider>
   );

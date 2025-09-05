@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from "next/script";
 import { Sixtyfour, Geist, Geist_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/theme-provider";
 import Navbar from "@/components/navbar";
@@ -44,6 +45,11 @@ export default function RootLayout({
           <Navbar />
           <main>{children}</main>
           <Toaster position="top-center" />
+                  <Script
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!}
+          strategy="afterInteractive"
+        />
         </ThemeProvider>
       </body>
     </html>

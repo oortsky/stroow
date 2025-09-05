@@ -3,14 +3,26 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import Terms, { attributes } from "@/content/terms.md";
 import MdxLayout from "@/components/mdx-layout";
+import dayjs from "dayjs";
+import "dayjs/locale/id";
 
 export const metadata = {
   title: "Troow - Terms and Conditions",
-  description: "Safe. Fast. Easy."
+  description: "Safe. Fast. Easy.",
+  openGraph: {
+    title: "Troow - Terms and Conditions",
+    description: "Safe. Fast. Easy.",
+    type: "article",
+    publishedTime: attributes.date
+  }
 };
+
+dayjs.locale("id");
 
 export default function Page() {
   const { title, date } = attributes;
+
+  const formattedDate = dayjs(date).format("dddd, D MMMM YYYY");
 
   return (
     <main className="container w-full h-screen mx-auto p-4 font-sans">
@@ -19,7 +31,7 @@ export default function Page() {
           <MdxLayout>
             <h1>{title}</h1>
             <p>
-              <strong>Tanggal Berlaku:</strong> {date}
+              <strong>Tanggal Berlaku:</strong> {formattedDate}
             </p>
             <Terms />
           </MdxLayout>

@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useFormContext } from "@/context/form-context";
 import { useForm } from "react-hook-form";
@@ -9,6 +8,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Banks } from "@/lib/enums/banks";
 import { randomID } from "@/utils/id";
 import { getFullName } from "@/utils/fullname";
+import { useSameAsName } from "@/hooks/use-same-as-name";
+import Cookies from "js-cookie";
 
 import {
   Form,
@@ -54,14 +55,14 @@ type PayeeFormValues = z.output<typeof payeeSchema>;
 
 export default function StepTwoPage() {
   const router = useRouter();
-  const { form, updateForm, currentStep, setCurrentStep, totalSteps} = useFormContext();
+  const { form, updateForm } = useFormContext();
 
   const stepTwoForm = useForm<PayeeFormValues>({
     resolver: zodResolver(payeeSchema),
     mode: "onChange",
     defaultValues: {
       ...form.payee,
-      id: form.payee?.id || randomID("PYR")
+      id: form.payee?.id || randomID("PYE")
     }
   });
 
@@ -71,29 +72,22 @@ export default function StepTwoPage() {
     stepTwoForm.watch("last_name")
   );
 
-  useEffect(() => {
-    if (sameAsName && fullName) {
-      stepTwoForm.setValue("account_holder_name", fullName.toUpperCase(), {
-        shouldValidate: true
-      });
-    }
-  }, [sameAsName, fullName, stepTwoForm]);
+  useSameAsName({
+    sameAsName,
+    fullName,
+    form: stepTwoForm,
+    fieldName: "account_holder_name"
+  });
 
   function onSubmit(values: PayeeFormValues) {
-    updateForm({
-      payee: { ...values, same_as_name: sameAsName }
-    });
+    updateForm({ payee: { ...values, same_as_name: sameAsName } });
+    Cookies.set("step2-done", "true", { path: "/transaction/new" });
     router.push("/transaction/new/step-three");
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep + 1);
-    }
   }
 
   function prevStep() {
+    Cookies.remove("step2-done", { path: "/transaction/new" });
     router.back();
-    if (currentStep < totalSteps) {
-      setCurrentStep(currentStep - 1);
-    }
   }
 
   return (
@@ -168,7 +162,7 @@ export default function StepTwoPage() {
           name="account_bank"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Bank</FormLabel>
+              <FormLabel>Account Bank</FormLabel>
               <FormControl>
                 <Combobox
                   items={[...Banks]}
@@ -208,7 +202,10 @@ export default function StepTwoPage() {
               <div className="flex items-center justify-between mb-2">
                 <FormLabel>Account Holder Name</FormLabel>
                 <div className="flex items-center gap-2">
-                  <Label htmlFor="sameAsName" className="text-xs">
+                  <Label
+                    htmlFor="sameAsName"
+                    className="text-xs text-muted-foreground"
+                  >
                     Same as Name
                   </Label>
                   <Switch
@@ -223,7 +220,7 @@ export default function StepTwoPage() {
               <FormControl>
                 <Input
                   {...field}
-                  value={field.value ?? ""}
+                  value={field.value}
                   onChange={e => field.onChange(e.target.value.toUpperCase())}
                   disabled={sameAsName}
                 />
