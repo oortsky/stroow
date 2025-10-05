@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { redirectUnauthorized } from "@/lib/unauthorized";
 
 const stepRequirements: Record<string, string> = {
   "step-two": "step1-done",
@@ -27,6 +28,9 @@ export function middleware(request: NextRequest) {
   const pathSegments = currentPath.split("/");
   const currentStep = pathSegments[pathSegments.length - 1];
 
+  // ==============
+  // Flow: /transaction/new
+  // ==============
   if (
     currentPath === "/transaction/new" ||
     currentPath === "/transaction/new/"
@@ -43,10 +47,8 @@ export function middleware(request: NextRequest) {
 
     if (!isRequiredStepDone) {
       const currentStepWord = currentStep.split("-")[1];
-
       const currentStepNumber = wordToNumber[currentStepWord];
       const previousStepNumber = currentStepNumber - 1;
-
       const previousStepWord = numberToWord[previousStepNumber];
 
       url.pathname = `/transaction/new/step-${previousStepWord}`;
@@ -54,9 +56,26 @@ export function middleware(request: NextRequest) {
     }
   }
 
+  // ==============
+  // Flow: /transaction/[id]/[role]/dashboard
+  // ==============
+  if (currentPath.includes("/dashboard")) {
+    const token = request.cookies.get("transaction-session")?.value;
+
+    if (!token) {
+      return redirectUnauthorized(url, "expired")
+    }
+
+    // TODO: di sini bisa tambahkan validasi token misalnya JWT decode
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/transaction/new", "/transaction/new/:path*"]
+  matcher: [
+    "/transaction/new",
+    "/transaction/new/:path*",
+    "/transaction/:path*/dashboard"
+  ]
 };

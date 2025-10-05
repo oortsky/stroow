@@ -44,12 +44,12 @@ export default function RootLayout({
         >
           <Navbar />
           <main>{children}</main>
-          <Toaster position="top-center" />
-                  <Script
-          src="https://app.sandbox.midtrans.com/snap/snap.js"
-          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!}
-          strategy="afterInteractive"
-        />
+          <Toaster position="bottom-center" />
+          <Script
+            src="https://app.sandbox.midtrans.com/snap/snap.js"
+            data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!}
+            strategy="afterInteractive"
+          />
         </ThemeProvider>
       </body>
     </html>

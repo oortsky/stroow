@@ -11,7 +11,10 @@ import { Banks } from "@/lib/enums/banks";
 import { getFullName } from "@/utils/fullname";
 import Cookies from "js-cookie";
 import axios from "axios";
-import { useInsertUser, useInsertTransaction } from "@/hooks/use-insert";
+import { createUser } from "@/actions/create-user";
+import { createTransaction } from "@/actions/create-transaction";
+import { updateTransaction } from "@/actions/update-transaction";
+import { TransactionStatusEnum } from "@/lib/enums/transaction-status";
 
 import {
   Form,
@@ -71,20 +74,34 @@ export default function Page() {
       updatedForm.transaction.snap
     );
 
+    // Harus dipisah kayaknya. Supaya gw bisa ambil value id yang diinput dari halaman lain.
+    // Tambahkan system snap token saving
+
     if (typeof window !== "undefined" && (window as any).snap) {
       (window as any).snap.pay(response?.data?.token, {
         onSuccess: async (result: any) => {
           try {
             toast.success("Payment successful! Your funds are now in escrow.");
 
-            await useInsertUser(updatedForm.payer);
-            await useInsertUser(updatedForm.payee);
-            await useInsertTransaction(updatedForm.transaction);
+            await createUser(updatedForm.payer);
+            await createUser(updatedForm.payee);
+            await createTransaction(updatedForm.transaction);
+
+            await updateTransaction({
+              id: updatedForm.transaction?.id,
+              data: { status: TransactionStatusEnum.PAID }
+            });
+
+            // TODO: Tanya AI, mana yang lebih best practice antara add transaction ketika sudah payment atau sebelum payment? dan apakah benar jika mau update status transaksi seperti itu? kemudian lebih bagus mana add atau create?
 
             await router.push(
-              `/transaction/${updatedForm.transaction?.id}?role=${updatedForm.payer?.id}`
+              `/transaction/${updatedForm.transaction?.id}/${updatedForm.payer?.id}`
             );
-            await resetForm();
+            // OR
+            await router.push(`/transaction/new/succeed`);
+
+            await resetForm(); // Reset Form akan ditaruh di succeed page.
+
             await Cookies.remove("step1-done", { path: "/transaction/new" });
             await Cookies.remove("step2-done", { path: "/transaction/new" });
             await Cookies.remove("step3-done", { path: "/transaction/new" });
